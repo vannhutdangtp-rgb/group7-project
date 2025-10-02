@@ -2,3 +2,4 @@
 
 -Đặng Văn Nhựt-220999: Backend (Node.js + Express) + Database (MongoDB)  
 -Lê Hoàng Hảo: Frontend (React) 
+-Hoàng Nguyễn Hữu Lộc: Bị Bệnh có giấy khám bên file word
