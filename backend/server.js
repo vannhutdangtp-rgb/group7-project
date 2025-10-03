@@ -2,10 +2,14 @@
 require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
+const cors = require("cors");
 const User = require("./models/User");
 
 const app = express();
-app.use(express.json());
+
+// Middleware
+app.use(cors());           // cho phép frontend gọi API
+app.use(express.json());   // đọc dữ liệu JSON từ body
 
 // 🔹 Kết nối MongoDB
 mongoose.connect(process.env.MONGO_URI)
@@ -39,5 +43,5 @@ app.post("/users", async (req, res) => {
 });
 
 // 🔹 Server listen
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));

@@ -11,8 +11,13 @@ const UserList = () => {
   }, []);
 
   const fetchUsers = async () => {
+    try {
     const res = await getUsers();
-    setUsers(res.data.data); // chú ý: backend trả { success, data }
+    console.log("API response:", res.data); // 👈 log ra để kiểm tra
+    setUsers(res.data.data);
+  } catch (err) {
+    console.error("Fetch users error:", err);
+  }
   };
 
   const handleAddUser = async () => {
@@ -27,9 +32,13 @@ const UserList = () => {
     <div style={{ padding: "20px" }}>
       <h2>Danh sách User từ MongoDB</h2>
       <ul>
-        {users.map((u) => (
-          <li key={u._id}>{u.name} - {u.email}</li>
-        ))}
+        {users && users.length > 0 ? (
+          users.map((u) => (
+            <li key={u._id}>{u.name} - {u.email}</li>
+          ))
+        ) : (
+          <p>Không có user nào</p>
+        )}
       </ul>
 
       <input
