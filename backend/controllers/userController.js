@@ -1,62 +1,47 @@
-// backend/controllers/userController.js
-
 let users = [
-  { id: 1, name: "Đặng Văn Nhựt", email: "nhutdangvantp.@gmail.com" },
-  { id: 2, name: "Hoàng Nguyễn Hữu Lộc", email: "dangbenh" },
-  { id: 3, name: "Lê Hoàng Hảo", email: "lehoanghaokk@gmail.com" }
+  { id: 1, name: "Đặng Văn Nhựt", email: "nhutdangvantp@gmail.com" },
+  { id: 2, name: "Hoàng Nguyễn Hữu Lộc", email: "loc@gmail.com" },
+  { id: 3, name: "Lê Hoàng Hảo", email: "hao@gmail.com" }
 ];
 
-// Lấy danh sách người dùng (GET)
+// GET
 exports.getUsers = (req, res) => {
-  return res.json({ success: true, data: users });
+  res.json({ success: true, data: users });
 };
 
-// Tạo user mới (POST)
+// POST
 exports.createUser = (req, res) => {
   const { name, email } = req.body;
+  if (!name || !email)
+    return res.status(400).json({ success: false, message: "Thiếu name hoặc email" });
 
-  if (!name || !email) {
-    return res.status(400).json({ success: false, message: "Vui lòng gửi name và email" });
-  }
-
-  const newId = users.length ? users[users.length - 1].id + 1 : 1;
-  const newUser = { id: newId, name, email };
+  const newUser = { id: Date.now(), name, email };
   users.push(newUser);
-
-  return res.status(201).json({ success: true, data: newUser });
+  res.status(201).json({ success: true, data: newUser });
 };
 
-// ✅ Sửa user (PUT)
+// PUT
 exports.updateUser = (req, res) => {
   const { id } = req.params;
   const { name, email } = req.body;
 
   const index = users.findIndex(u => u.id == id);
-  if (index === -1) {
+  if (index === -1)
     return res.status(404).json({ success: false, message: "Không tìm thấy user" });
-  }
 
-  // Cập nhật thông tin (nếu có)
   if (name) users[index].name = name;
   if (email) users[index].email = email;
 
-  return res.json({ success: true, data: users[index] });
+  res.json({ success: true, data: users[index] });
 };
 
-// ✅ Xóa user (DELETE)
+// DELETE
 exports.deleteUser = (req, res) => {
   const { id } = req.params;
   const index = users.findIndex(u => u.id == id);
-
-  if (index === -1) {
+  if (index === -1)
     return res.status(404).json({ success: false, message: "Không tìm thấy user" });
-  }
 
-  const deletedUser = users[index];
-  users.splice(index, 1);
-
-  return res.json({ success: true, message: "Đã xóa user thành công", data: deletedUser });
+  const deleted = users.splice(index, 1);
+  res.json({ success: true, message: "Đã xóa user", data: deleted[0] });
 };
-
-// (Tuỳ chọn) Export users để test / reset
-exports._getStore = () => users;

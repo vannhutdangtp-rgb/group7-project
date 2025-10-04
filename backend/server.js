@@ -1,47 +1,15 @@
-// backend/server.js
-require("dotenv").config();
 const express = require("express");
-const mongoose = require("mongoose");
 const cors = require("cors");
-const User = require("./models/User");
+require("dotenv").config();
 
 const app = express();
 
-// Middleware
-app.use(cors());           // cho phép frontend gọi API
-app.use(express.json());   // đọc dữ liệu JSON từ body
+app.use(cors());
+app.use(express.json());
 
-// 🔹 Kết nối MongoDB
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log("✅ MongoDB connected"))
-  .catch(err => console.error("❌ MongoDB connection error:", err));
+// ✅ Import router
+const userRoutes = require("./routes/user");
+app.use("/users", userRoutes); // tất cả routes sẽ có prefix /users
 
-// 🔹 Routes
-// GET all users
-app.get("/users", async (req, res) => {
-  try {
-    const users = await User.find();
-    res.json({ success: true, data: users });
-  } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
-  }
-});
-
-// POST add user
-app.post("/users", async (req, res) => {
-  const { name, email } = req.body;
-  if (!name || !email) {
-    return res.status(400).json({ success: false, message: "Vui lòng gửi name và email" });
-  }
-  try {
-    const newUser = new User({ name, email });
-    await newUser.save();
-    res.status(201).json({ success: true, data: newUser });
-  } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
-  }
-});
-
-// 🔹 Server listen
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
