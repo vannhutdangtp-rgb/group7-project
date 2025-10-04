@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { getUsers, addUser, updateUser, deleteUser } from "./services/api"; // import file API
+import { getUsers, addUser, updateUser, deleteUser } from "./services/api";
 
 function UserList() {
   const [users, setUsers] = useState([]);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
 
-  // Lấy danh sách user khi load trang
+  // ================== Load danh sách khi vào trang ==================
   useEffect(() => {
     fetchUsers();
   }, []);
@@ -14,7 +14,7 @@ function UserList() {
   const fetchUsers = async () => {
     try {
       const res = await getUsers();
-      setUsers(res.data.data);
+      setUsers(res.data.data || res.data); // linh hoạt nếu API trả về khác
     } catch (err) {
       console.error("Lỗi khi tải users:", err);
     }
@@ -22,7 +22,10 @@ function UserList() {
 
   // ================== Thêm User ==================
   const handleAdd = async () => {
-    if (!name || !email) return alert("Vui lòng nhập đủ tên và email");
+    if (!name || !email) return alert("⚠️ Vui lòng nhập đủ tên và email");
+    if (!/\S+@\S+\.\S+/.test(email)) return alert("⚠️ Email không hợp lệ");
+    if (users.some((u) => u.email === email)) return alert("⚠️ Email đã tồn tại");
+
     try {
       await addUser({ name, email });
       setName("");
@@ -51,7 +54,7 @@ function UserList() {
     if (!window.confirm("Bạn có chắc muốn xóa user này không?")) return;
     try {
       await deleteUser(id);
-      setUsers(users.filter((u) => u._id !== id));
+      setUsers(users.filter((u) => (u.id || u._id) !== id));
     } catch (err) {
       console.error("Lỗi khi xóa user:", err);
     }
@@ -79,10 +82,10 @@ function UserList() {
       <h3>Danh sách User</h3>
       <ul>
         {users.map((user) => (
-          <li key={user.id}>
+          <li key={user.id || user._id}>
             {user.name} - {user.email}{" "}
-            <button onClick={() => handleEdit(user.id)}>Sửa</button>{" "}
-            <button onClick={() => handleDelete(user.id)}>Xóa</button>
+            <button onClick={() => handleEdit(user.id || user._id)}>Sửa</button>{" "}
+            <button onClick={() => handleDelete(user.id || user._id)}>Xóa</button>
           </li>
         ))}
       </ul>
