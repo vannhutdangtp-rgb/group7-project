@@ -7,7 +7,10 @@ function AddUser({ onUserAdded }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    axios.post("http://localhost:5000/users", { name, email }) // sửa lại link
     axios.post("http://localhost:3000/users", { name, email }) // sửa lại link
+
       .then(res => {
         onUserAdded(); // gọi lại UserList để load thêm user mới
         setName("");

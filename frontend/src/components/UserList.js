@@ -11,6 +11,22 @@ const UserList = () => {
   }, []);
 
   const fetchUsers = async () => {
+
+    try {
+    const res = await getUsers();
+    console.log("API response:", res.data);
+
+    // Kiểm tra trả về đúng format không
+    if (res.data.success) {
+      setUsers(res.data.data); // trường hợp backend có success + data
+    } else if (Array.isArray(res.data)) {
+      setUsers(res.data); // trường hợp backend trả thẳng array
+    } else {
+      console.error("Unexpected API format:", res.data);
+    }
+  } catch (err) {
+    console.error("Fetch users error:", err);
+  }
     const res = await getUsers();
     setUsers(res.data.data); // chú ý: backend trả { success, data }
   };
@@ -27,6 +43,13 @@ const UserList = () => {
     <div style={{ padding: "20px" }}>
       <h2>Danh sách User từ MongoDB</h2>
       <ul>
+        {users && users.length > 0 ? (
+          users.map((u) => (
+            <li key={u._id}>{u.name} - {u.email}</li>
+          ))
+        ) : (
+          <p>Không có user nào</p>
+        )}
         {users.map((u) => (
           <li key={u._id}>{u.name} - {u.email}</li>
         ))}
@@ -48,5 +71,4 @@ const UserList = () => {
     </div>
   );
 };
-
 export default UserList;
