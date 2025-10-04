@@ -11,6 +11,7 @@ const UserList = () => {
   }, []);
 
   const fetchUsers = async () => {
+
     try {
     const res = await getUsers();
     console.log("API response:", res.data);
@@ -26,6 +27,8 @@ const UserList = () => {
   } catch (err) {
     console.error("Fetch users error:", err);
   }
+    const res = await getUsers();
+    setUsers(res.data.data); // chú ý: backend trả { success, data }
   };
 
   const handleAddUser = async () => {
@@ -47,6 +50,9 @@ const UserList = () => {
         ) : (
           <p>Không có user nào</p>
         )}
+        {users.map((u) => (
+          <li key={u._id}>{u.name} - {u.email}</li>
+        ))}
       </ul>
 
       <input
@@ -65,5 +71,4 @@ const UserList = () => {
     </div>
   );
 };
-
 export default UserList;
