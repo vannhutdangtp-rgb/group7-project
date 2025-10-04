@@ -13,8 +13,16 @@ const UserList = () => {
   const fetchUsers = async () => {
     try {
     const res = await getUsers();
-    console.log("API response:", res.data); // 👈 log ra để kiểm tra
-    setUsers(res.data.data);
+    console.log("API response:", res.data);
+
+    // Kiểm tra trả về đúng format không
+    if (res.data.success) {
+      setUsers(res.data.data); // trường hợp backend có success + data
+    } else if (Array.isArray(res.data)) {
+      setUsers(res.data); // trường hợp backend trả thẳng array
+    } else {
+      console.error("Unexpected API format:", res.data);
+    }
   } catch (err) {
     console.error("Fetch users error:", err);
   }
