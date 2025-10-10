@@ -18,4 +18,12 @@ export const updateProfile = async (token, data) =>
   API.put("/profile", data, {
     headers: { Authorization: `Bearer ${token}` },
   });
+export const getUsers = (token) =>
+  API.get("/users", {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+export const deleteUser = (token, id) =>
+  API.delete(`/users/${id}`, {
+    headers: { Authorization: `Bearer ${token}` },
   });

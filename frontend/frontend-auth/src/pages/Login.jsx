@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import { login } from "../services/api";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
   const [message, setMessage] = useState("");
   const [token, setToken] = useState("");
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -14,9 +16,20 @@ export default function Login() {
     e.preventDefault();
     try {
       const res = await login(form);
+
+      // ✅ Lưu token và role vào localStorage
       localStorage.setItem("token", res.data.token);
+      localStorage.setItem("role", res.data.user.role);
+
       setMessage(res.data.message || "Đăng nhập thành công!");
       setToken(res.data.token);
+
+      // ✅ Điều hướng theo role
+      if (res.data.user.role === "admin") {
+        navigate("/admin");
+      } else {
+        navigate("/profile");
+      }
     } catch (err) {
       setMessage(err.response?.data?.message || "Lỗi đăng nhập!");
     }
