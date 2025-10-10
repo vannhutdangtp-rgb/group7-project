@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import connectDB from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
+import profileRoutes from "./routes/profileRoutes.js"; // 🆕 thêm dòng này
 
 dotenv.config();
 
@@ -15,6 +16,7 @@ connectDB();
 
 // Định tuyến
 app.use("/api/auth", authRoutes);
+app.use("/api/profile", profileRoutes); // 🆕 thêm dòng này
 
 // Chạy server
 const PORT = process.env.PORT || 5000;
