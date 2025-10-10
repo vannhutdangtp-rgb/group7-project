@@ -18,3 +18,4 @@ export const updateProfile = async (token, data) =>
   API.put("/profile", data, {
     headers: { Authorization: `Bearer ${token}` },
   });
+  });
