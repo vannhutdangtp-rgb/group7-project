@@ -16,35 +16,24 @@ export default function Login() {
     e.preventDefault();
     try {
       const res = await login(form);
-
-      // ✅ Lưu token và role vào localStorage
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("role", res.data.user.role);
 
       setMessage(res.data.message || "Đăng nhập thành công!");
       setToken(res.data.token);
 
-      // ✅ Điều hướng theo role
-      if (res.data.user.role === "admin") {
-        navigate("/admin");
-      } else {
-        navigate("/profile");
-      }
+      if (res.data.user.role === "admin") navigate("/admin");
+      else navigate("/profile");
     } catch (err) {
       setMessage(err.response?.data?.message || "Lỗi đăng nhập!");
     }
   };
 
   return (
-    <div className="container">
+    <div className="container" style={{ maxWidth: 400, margin: "auto" }}>
       <h2>Đăng nhập</h2>
       <form onSubmit={handleSubmit}>
-        <input
-          name="email"
-          placeholder="Email"
-          onChange={handleChange}
-          required
-        />
+        <input name="email" placeholder="Email" onChange={handleChange} required />
         <input
           type="password"
           name="password"
@@ -54,8 +43,25 @@ export default function Login() {
         />
         <button type="submit">Đăng nhập</button>
       </form>
-      <p>{message}</p>
 
+      {/* Nút quên mật khẩu */}
+      <p style={{ marginTop: "10px" }}>
+        <button
+          type="button"
+          onClick={() => navigate("/forgot-password")}
+          style={{
+            background: "none",
+            border: "none",
+            color: "blue",
+            textDecoration: "underline",
+            cursor: "pointer",
+          }}
+        >
+          Quên mật khẩu?
+        </button>
+      </p>
+
+      {message && <p>{message}</p>}
       {token && (
         <div style={{ marginTop: "10px", wordBreak: "break-all" }}>
           <strong>JWT Token:</strong>
