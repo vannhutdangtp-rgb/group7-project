@@ -64,7 +64,7 @@ router.post("/forgot-password", async (req, res) => {
     user.resetPasswordExpire = resetTokenExpire;
     await user.save();
 
-    const resetUrl = `http://localhost:5000/api/profile/reset-password/${resetToken}`;
+    const resetUrl = `http://localhost:3000/reset-password/${resetToken}`;
     console.log("🔗 Link reset mật khẩu:", resetUrl);
 
     res.json({

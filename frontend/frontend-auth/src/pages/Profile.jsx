@@ -1,40 +1,50 @@
 import React, { useEffect, useState } from "react";
-import { getProfile, updateProfile } from "../services/api";
+import { getProfile, updateProfile, uploadAvatar } from "../services/api";
 
 export default function Profile() {
-  const [user, setUser] = useState(null); // Dữ liệu gốc
-  const [form, setForm] = useState({ name: "", email: "" }); // Dữ liệu nhập sửa
+  const [user, setUser] = useState(null);
+  const [form, setForm] = useState({ name: "", email: "" });
   const [message, setMessage] = useState("");
-  const [updatedUser, setUpdatedUser] = useState(null); // Dữ liệu sau cập nhật
-
+  const [file, setFile] = useState(null);
   const token = localStorage.getItem("token");
 
-  // 🟩 Lấy thông tin ban đầu
   useEffect(() => {
     const fetchProfile = async () => {
       try {
         const res = await getProfile(token);
         setUser(res.data);
         setForm({ name: res.data.name, email: res.data.email });
-      } catch (err) {
+      } catch {
         setMessage("Lỗi tải thông tin người dùng!");
       }
     };
     fetchProfile();
   }, [token]);
 
-  // 🟩 Cập nhật thông tin
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
       const res = await updateProfile(token, form);
       setMessage(res.data.message || "✅ Cập nhật thành công!");
-
-      // Gọi lại API để lấy thông tin mới nhất
       const refreshed = await getProfile(token);
-      setUpdatedUser(refreshed.data);
-    } catch (err) {
+      setUser(refreshed.data);
+    } catch {
       setMessage("❌ Lỗi cập nhật!");
+    }
+  };
+
+  const handleUpload = async (e) => {
+    e.preventDefault();
+    if (!file) return setMessage("Vui lòng chọn ảnh!");
+    const formData = new FormData();
+    formData.append("avatar", file);
+    try {
+      await uploadAvatar(token, formData);
+      setMessage("✅ Avatar đã được cập nhật!");
+      const refreshed = await getProfile(token);
+      setUser(refreshed.data);
+    } catch {
+      setMessage("❌ Lỗi upload ảnh!");
     }
   };
 
@@ -44,14 +54,29 @@ export default function Profile() {
 
       {user ? (
         <>
-          {/* 🧩 Thông tin hiện tại */}
-          <div style={{ marginBottom: "20px" }}>
-            <h4>Trước khi cập nhật:</h4>
-            <p><strong>Tên:</strong> {user.name}</p>
-            <p><strong>Email:</strong> {user.email}</p>
+          {/* 🖼️ Avatar */}
+          <div style={{ textAlign: "center", marginBottom: 20 }}>
+            <img
+              src={user.avatar || "/default-avatar.png"}
+              alt="Avatar"
+              style={{
+                width: "120px",
+                height: "120px",
+                borderRadius: "50%",
+                objectFit: "cover",
+                border: "2px solid #ccc",
+               }}
+            />
+
           </div>
 
-          {/* 🧩 Form cập nhật */}
+          {/* Upload avatar */}
+          <form onSubmit={handleUpload} style={{ marginBottom: 20 }}>
+            <input type="file" accept="image/*" onChange={(e) => setFile(e.target.files[0])} />
+            <button type="submit">Tải lên Avatar</button>
+          </form>
+
+          {/* Form cập nhật */}
           <form onSubmit={handleUpdate}>
             <input
               name="name"
@@ -70,17 +95,7 @@ export default function Profile() {
             <button type="submit">Cập nhật</button>
           </form>
 
-          {/* 🧩 Thông báo */}
           {message && <p style={{ marginTop: 10 }}>{message}</p>}
-
-          {/* 🧩 Hiển thị thông tin sau cập nhật */}
-          {updatedUser && (
-            <div style={{ marginTop: "20px" }}>
-              <h4>Sau khi cập nhật:</h4>
-              <p><strong>Tên:</strong> {updatedUser.name}</p>
-              <p><strong>Email:</strong> {updatedUser.email}</p>
-            </div>
-          )}
         </>
       ) : (
         <p>Đang tải...</p>
@@ -88,4 +103,3 @@ export default function Profile() {
     </div>
   );
 }
-
