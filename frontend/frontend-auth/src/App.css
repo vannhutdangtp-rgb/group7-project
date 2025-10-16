@@ -1,38 +1,104 @@
-.App {
-  text-align: center;
-}
+/* App.css - layout chính */
+* { box-sizing: border-box; font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial; }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
+.app-root {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  background: #f3f6fb;
+  color: #1f2937;
+}
+
+/* Topbar */
+.topbar {
+  background: linear-gradient(90deg,#2563eb,#1e40af);
+  color: #fff;
+  padding: 14px 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.topbar .container {
+  width: 100%;
+  max-width: 980px;
+  margin: 0 auto;
+  display: flex;
   align-items: center;
+  justify-content: space-between;
+  padding: 0 18px;
+}
+.brand {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+.navlinks {
+  display: flex;
+  gap: 16px;
+}
+.navlink {
+  color: rgba(255,255,255,0.92);
+  text-decoration: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-weight: 500;
+}
+.navlink:hover { background: rgba(255,255,255,0.08); }
+.navlink.active { background: rgba(255,255,255,0.14); font-weight: 700; }
+
+/* Main content area */
+.main-container {
+  flex: 1;
+  display: flex;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
+  padding: 28px 16px;
+}
+.card {
+  width: 100%;
+  max-width: 980px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(15,23,42,0.06);
+  padding: 28px;
+  min-height: 360px;
+}
+
+/* Footer */
+.footer {
+  text-align: center;
+  padding: 12px;
+  color: #6b7280;
+  font-size: 13px;
+  border-top: 1px solid #eef2f7;
+}
+
+/* Form & Profile small styles (you can reuse them inside pages) */
+.form-row { margin-bottom: 12px; display:flex; gap:8px; align-items:center; }
+.input, input[type="text"], input[type="email"], input[type="password"], textarea {
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  outline: none;
+  font-size: 14px;
+  width: 100%;
+}
+.btn {
+  background: #2563eb;
   color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
 }
-
-.App-link {
-  color: #61dafb;
+.btn-danger {
+  background: #ef4444;
 }
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.small-muted { color: #6b7280; font-size: 13px; }
+.center { text-align: center; }
+.avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #e6eefc;
+  background: #f8fafc;
 }
