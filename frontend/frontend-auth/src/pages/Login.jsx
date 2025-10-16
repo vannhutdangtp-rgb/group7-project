@@ -16,11 +16,12 @@ export default function Login() {
     e.preventDefault();
     try {
       const res = await login(form);
-      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("accessToken", res.data.accessToken);
+      localStorage.setItem("refreshToken", res.data.refreshToken);
       localStorage.setItem("role", res.data.user.role);
 
       setMessage(res.data.message || "Đăng nhập thành công!");
-      setToken(res.data.token);
+      setToken(res.data.accessToken);
 
       if (res.data.user.role === "admin") navigate("/admin");
       else navigate("/profile");
