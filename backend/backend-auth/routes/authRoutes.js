@@ -66,7 +66,7 @@ router.post("/login", async (req, res) => {
     const accessToken = jwt.sign(
       { id: user._id, email: user.email, role: user.role },
       process.env.ACCESS_TOKEN_SECRET || "access_secret_key",
-      { expiresIn: "15m" }
+      { expiresIn: "30s" }
     );
 
     // ====== Tạo Refresh Token (dài hạn) ======
