@@ -3,6 +3,7 @@ import { signup } from "../services/api";
 
 export default function Signup() {
   const [form, setForm] = useState({ name: "", email: "", password: "", role: "user" });
+  const [confirmPassword, setConfirmPassword] = useState(""); // 🔹 Thêm dòng này
   const [message, setMessage] = useState("");
 
   const handleChange = (e) => {
@@ -11,6 +12,13 @@ export default function Signup() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // 🔹 Kiểm tra mật khẩu khớp
+    if (form.password !== confirmPassword) {
+      setMessage("❌ Mật khẩu nhập lại không khớp!");
+      return;
+    }
+
     try {
       const res = await signup(form);
       setMessage(res.data.message || "Đăng ký thành công!");
@@ -40,6 +48,16 @@ export default function Signup() {
           name="password"
           placeholder="Mật khẩu"
           onChange={handleChange}
+          required
+        />
+
+        {/* 🔹 Thêm phần nhập lại mật khẩu */}
+        <input
+          type="password"
+          name="confirmPassword"
+          placeholder="Nhập lại mật khẩu"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
           required
         />
 
