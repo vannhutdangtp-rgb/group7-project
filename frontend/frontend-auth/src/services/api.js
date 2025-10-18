@@ -18,13 +18,11 @@ API.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
-    if (
-      error.response?.status === 401 &&
-      !originalRequest._retry
-    ) {
-      originalRequest._retry = true;
 
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
       const refreshToken = localStorage.getItem("refreshToken");
+
       if (!refreshToken) {
         window.location.href = "/login";
         return Promise.reject(error);
@@ -36,11 +34,9 @@ API.interceptors.response.use(
           { refreshToken }
         );
 
-        // Lưu lại access token mới
         localStorage.setItem("accessToken", data.accessToken);
         API.defaults.headers.common["Authorization"] = `Bearer ${data.accessToken}`;
 
-        // Gửi lại request gốc
         return API(originalRequest);
       } catch (refreshErr) {
         console.error("❌ Refresh token thất bại:", refreshErr);
@@ -49,6 +45,7 @@ API.interceptors.response.use(
         window.location.href = "/login";
       }
     }
+
     return Promise.reject(error);
   }
 );
@@ -58,6 +55,8 @@ export const signup = (data) => API.post("/auth/signup", data);
 export const login = (data) => API.post("/auth/login", data);
 export const refreshTokenAPI = (refreshToken) => API.post("/auth/refresh", { refreshToken });
 export const logoutAPI = (refreshToken) => API.post("/auth/logout", { refreshToken });
+
+// ✅ Hoạt động 2: quên mật khẩu / đặt lại mật khẩu chuyển về /auth/
 export const forgotPassword = (data) => API.post("/profile/forgot-password", data);
 export const resetPassword = (token, data) => API.post(`/profile/reset-password/${token}`, data);
 
