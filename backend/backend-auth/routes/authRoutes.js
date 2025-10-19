@@ -5,6 +5,8 @@ import { body, validationResult } from "express-validator";
 import User from "../models/User.js";
 import RefreshToken from "../models/RefreshToken.js";
 import Role from "../models/role.js"; // ✅ thêm import Role
+import crypto from "crypto";
+import transporter from "../config/email.js"; // bạn tạo file email.js theo hướng dẫn trước
 
 const router = express.Router();
 
@@ -157,6 +159,77 @@ router.post("/logout", async (req, res) => {
     res.json({ message: "Đăng xuất thành công! (Refresh token đã thu hồi)" });
   } catch (err) {
     console.error(err);
+    res.status(500).json({ message: "Lỗi server" });
+  }
+});
+/* =======================
+   🧩 QUÊN MẬT KHẨU - FORGOT PASSWORD
+======================= */
+router.post("/forgot-password", async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) return res.status(404).json({ message: "Không tìm thấy email!" });
+
+    // Sinh token reset
+    const resetToken = crypto.randomBytes(32).toString("hex");
+    const hashedToken = crypto.createHash("sha256").update(resetToken).digest("hex");
+
+    user.resetPasswordToken = hashedToken; // ✅ Lưu token dạng hash
+    user.resetPasswordExpire = Date.now() + 10 * 60 * 1000; // 10 phút
+    await user.save();
+
+    // Gửi link có token gốc
+    const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
+
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: user.email,
+      subject: "Đặt lại mật khẩu của bạn",
+      html: `
+        <h3>Xin chào ${user.name},</h3>
+        <p>Bạn vừa yêu cầu đặt lại mật khẩu.</p>
+        <p>Nhấn vào link bên dưới để tiếp tục:</p>
+        <a href="${resetUrl}">${resetUrl}</a>
+        <p>Liên kết có hiệu lực trong 10 phút.</p>
+      `,
+    });
+
+    res.json({ message: "Email đặt lại mật khẩu đã được gửi!" });
+  } catch (err) {
+    console.error("❌ Lỗi forgot-password:", err);
+    res.status(500).json({ message: "Lỗi server" });
+  }
+});
+/* =======================
+   POST /reset-password
+======================= */
+router.post("/reset-password", async (req, res) => {
+  try {
+    const { token, password } = req.body;
+
+    const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+
+    const user = await User.findOne({
+      resetPasswordToken: hashedToken,
+      resetPasswordExpire: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: "Token không hợp lệ hoặc đã hết hạn" });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(password, salt);
+
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+
+    await user.save();
+
+    res.json({ message: "Mật khẩu đã được đặt lại thành công!" });
+  } catch (error) {
+    console.error(error);
     res.status(500).json({ message: "Lỗi server" });
   }
 });
