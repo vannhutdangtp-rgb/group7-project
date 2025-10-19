@@ -5,12 +5,10 @@ import { useNavigate } from "react-router-dom";
 export default function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
   const [message, setMessage] = useState("");
-  const [token, setToken] = useState("");
   const navigate = useNavigate();
 
-  const handleChange = (e) => {
+  const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -20,13 +18,13 @@ export default function Login() {
       localStorage.setItem("refreshToken", res.data.refreshToken);
       localStorage.setItem("role", res.data.user.role);
 
-      setMessage(res.data.message || "Đăng nhập thành công!");
-      setToken(res.data.accessToken);
+      setMessage("✅ Đăng nhập thành công!");
+      const role = res.data.user.role;
 
-      if (res.data.user.role === "admin") navigate("/admin");
+      if (role === "admin") navigate("/admin");
       else navigate("/profile");
     } catch (err) {
-      setMessage(err.response?.data?.message || "Lỗi đăng nhập!");
+      setMessage(err.response?.data?.message || "❌ Sai email hoặc mật khẩu!");
     }
   };
 
@@ -34,7 +32,12 @@ export default function Login() {
     <div className="container" style={{ maxWidth: 400, margin: "auto" }}>
       <h2>Đăng nhập</h2>
       <form onSubmit={handleSubmit}>
-        <input name="email" placeholder="Email" onChange={handleChange} required />
+        <input
+          name="email"
+          placeholder="Email"
+          onChange={handleChange}
+          required
+        />
         <input
           type="password"
           name="password"
@@ -45,7 +48,6 @@ export default function Login() {
         <button type="submit">Đăng nhập</button>
       </form>
 
-      {/* Nút quên mật khẩu */}
       <p style={{ marginTop: "10px" }}>
         <button
           type="button"
@@ -63,12 +65,6 @@ export default function Login() {
       </p>
 
       {message && <p>{message}</p>}
-      {token && (
-        <div style={{ marginTop: "10px", wordBreak: "break-all" }}>
-          <strong>JWT Token:</strong>
-          <p>{token}</p>
-        </div>
-      )}
     </div>
   );
 }

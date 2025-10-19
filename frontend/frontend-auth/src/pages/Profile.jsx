@@ -14,7 +14,7 @@ export default function Profile() {
         setUser(res.data);
         setForm({ name: res.data.name, email: res.data.email });
       } catch {
-        setMessage("❌ Lỗi tải thông tin người dùng!");
+        setMessage("❌ Lỗi tải thông tin người dùng! Hãy đăng nhập lại.");
       }
     };
     fetchProfile();
@@ -59,7 +59,7 @@ export default function Profile() {
 
   return (
     <div className="container" style={{ maxWidth: 400, margin: "auto" }}>
-      <h2>Thông tin cá nhân</h2>
+      <h2>Hồ sơ cá nhân</h2>
       {user ? (
         <>
           <div style={{ textAlign: "center", marginBottom: 20 }}>
@@ -93,8 +93,8 @@ export default function Profile() {
               name="email"
               value={form.email}
               onChange={(e) => setForm({ ...form, email: e.target.value })}
-              placeholder="Email"
-required
+placeholder="Email"
+              required
             />
             <button type="submit">Cập nhật</button>
           </form>
