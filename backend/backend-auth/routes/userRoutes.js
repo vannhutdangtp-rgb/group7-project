@@ -1,6 +1,7 @@
 import express from "express";
 import User from "../models/User.js";
 import { protect, adminOnly, editorOrAdmin } from "../middleware/authMiddleware.js";
+import Log from "../models/Log.js";
 
 const router = express.Router();
 
@@ -32,6 +33,18 @@ router.delete("/:id", protect, async (req, res) => {
     }
   } catch (err) {
     res.status(500).json({ message: "Lỗi server" });
+  }
+});
+// 📜 API xem log hoạt động (chỉ admin)
+router.get("/logs", protect, adminOnly, async (req, res) => {
+  try {
+    const logs = await Log.find()
+      .populate("userId", "name email")
+      .sort({ timestamp: -1 });
+    res.json(logs);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Lỗi server khi lấy logs" });
   }
 });
 
