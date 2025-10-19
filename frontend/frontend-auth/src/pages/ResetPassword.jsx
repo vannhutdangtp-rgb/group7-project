@@ -18,7 +18,7 @@ const ResetPassword = () => {
     }
 
     try {
-      const { data } = await resetPassword(token, { password });
+      const { data } = await resetPassword({ token, password });
       setMessage("✅ Đặt lại mật khẩu thành công!");
       setTimeout(() => navigate("/login"), 2000);
     } catch (err) {

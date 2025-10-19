@@ -57,8 +57,8 @@ export const refreshTokenAPI = (refreshToken) => API.post("/auth/refresh", { ref
 export const logoutAPI = (refreshToken) => API.post("/auth/logout", { refreshToken });
 
 // ✅ Hoạt động 2: quên mật khẩu / đặt lại mật khẩu chuyển về /auth/
-export const forgotPassword = (data) => API.post("/profile/forgot-password", data);
-export const resetPassword = (token, data) => API.post(`/profile/reset-password/${token}`, data);
+export const forgotPassword = (data) => API.post("/auth/forgot-password", data);
+export const resetPassword = (data) => API.post("/auth/reset-password", data);
 
 // ========== PROFILE ==========
 export const getProfile = () => API.get("/profile");

@@ -96,7 +96,7 @@ export default function Profile() {
       setMessage("❌ Lỗi upload ảnh!");
     }
   };
-const handleFileChange = (e) => {
+  const handleFileChange = (e) => {
     const selected = e.target.files[0];
     if (selected) {
       setFile(selected);
