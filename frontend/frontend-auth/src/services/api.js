@@ -50,6 +50,9 @@ API.interceptors.response.use(
   }
 );
 
+// ========== LOG (chỉ admin) ==========
+export const getLogs = () => API.get("/users/logs");
+
 // ========== AUTH ==========
 export const signup = (data) => API.post("/auth/signup", data);
 export const login = (data) => API.post("/auth/login", data);

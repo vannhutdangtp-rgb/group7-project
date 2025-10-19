@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { getUsers, deleteUser } from "../services/api";
+import { getUsers, deleteUser, getLogs } from "../services/api";
 import { useNavigate } from "react-router-dom";
 
 export default function Admin() {
   const [users, setUsers] = useState([]);
+  const [logs, setLogs] = useState([]); // 🆕 log hệ thống
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
 
@@ -44,6 +45,17 @@ export default function Admin() {
     }
   };
 
+  // 🆕 Hàm lấy log hệ thống
+  const handleViewLogs = async () => {
+    try {
+      const res = await getLogs();
+      setLogs(res.data);
+      setMessage("✅ Đã tải log hệ thống!");
+    } catch (err) {
+      setMessage("❌ Không thể tải log hệ thống!");
+    }
+  };
+
   return (
     <div className="container">
       <h2>📋 Quản lý người dùng ({role})</h2>
@@ -79,6 +91,37 @@ export default function Admin() {
           )}
         </tbody>
       </table>
+
+      {/* 🆕 Chỉ admin mới thấy nút xem log */}
+      {role === "admin" && (
+        <div style={{ marginTop: "30px" }}>
+          <h3>🧾 Log hệ thống</h3>
+          <button onClick={handleViewLogs}>Xem log</button>
+
+          {logs.length > 0 ? (
+<table border="1" cellPadding="6" style={{ marginTop: "10px" }}>
+              <thead>
+                <tr>
+                  <th>Thời gian</th>
+                  <th>Người dùng</th>
+                  <th>Hành động</th>
+                </tr>
+              </thead>
+              <tbody>
+                {logs.map((log, i) => (
+                  <tr key={i}>
+                    <td>{new Date(log.timestamp).toLocaleString()}</td>
+                    <td>{log.userId?.email || "Ẩn danh"}</td>
+                    <td>{log.action}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <p>Chưa có log nào.</p>
+          )}
+        </div>
+      )}
     </div>
   );
 }
