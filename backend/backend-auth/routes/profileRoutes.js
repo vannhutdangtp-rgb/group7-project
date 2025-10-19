@@ -10,6 +10,8 @@ import { v2 as cloudinary } from "cloudinary";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 import { protect } from "../middleware/authMiddleware.js";
 import User from "../models/User.js";
+import sharp from "sharp";
+import streamifier from "streamifier";
 
 const router = express.Router();
 
@@ -123,18 +125,20 @@ cloudinary.config({
 /* ===================================================
    🧩 6️⃣ CẤU HÌNH MULTER STORAGE (UPLOAD ẢNH LÊN CLOUDINARY)
 =================================================== */
-const storage = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: {
-    folder: "avatars",
-    allowed_formats: ["jpg", "jpeg", "png"],
+const storage = multer.memoryStorage();
+const upload = multer({
+  storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // tối đa 5MB
+  fileFilter: (req, file, cb) => {
+    if (!file.mimetype.startsWith("image/")) {
+      return cb(new Error("Chỉ chấp nhận file ảnh!"), false);
+    }
+    cb(null, true);
   },
 });
 
-const upload = multer({ storage });
-
 /* ===================================================
-   🧩 7️⃣ UPLOAD AVATAR
+   🧩 7️⃣ UPLOAD & RESIZE AVATAR RỒI ĐẨY LÊN CLOUDINARY
 =================================================== */
 router.put("/upload-avatar", protect, upload.single("avatar"), async (req, res) => {
   try {
@@ -142,22 +146,42 @@ router.put("/upload-avatar", protect, upload.single("avatar"), async (req, res) 
       return res.status(400).json({ message: "Chưa có file để upload!" });
     }
 
-    const avatarUrl = req.file.path;
+    // Resize ảnh bằng Sharp (300x300, chất lượng 90%)
+    const resizedBuffer = await sharp(req.file.buffer)
+      .resize(300, 300)
+      .jpeg({ quality: 90 })
+      .toBuffer();
 
-    const user = await User.findByIdAndUpdate(
-      req.user._id,
-      { avatar: avatarUrl },
-      { new: true }
-    ).select("-password");
+    // Upload stream lên Cloudinary
+    const uploadStream = cloudinary.uploader.upload_stream(
+      { folder: "avatars", resource_type: "image" },
+      async (error, result) => {
+        if (error) {
+          console.error("❌ Lỗi upload Cloudinary:", error);
+          return res.status(500).json({ message: "Lỗi upload Cloudinary", error });
+        }
 
-    res.json({
-      message: "Upload avatar thành công!",
-      avatarUrl,
-      user,
-    });
+        const avatarUrl = result.secure_url;
+
+        // Cập nhật user
+        const user = await User.findByIdAndUpdate(
+          req.user._id,
+          { avatar: avatarUrl },
+          { new: true }
+        ).select("-password");
+
+        res.json({
+          message: "Upload & resize avatar thành công!",
+          avatarUrl,
+          user,
+        });
+      }
+    );
+
+    streamifier.createReadStream(resizedBuffer).pipe(uploadStream);
   } catch (err) {
     console.error("❌ Upload avatar error:", err);
-    res.status(500).json({ message: "Lỗi server khi upload avatar" });
+    res.status(500).json({ message: "Lỗi server khi upload avatar", error: err.message });
   }
 });
 
