@@ -41,8 +41,23 @@ router.put("/", protect, async (req, res) => {
       { name, email },
       { new: true }
     ).select("-password");
+    if (!updatedUser) {
+      return res.status(404).json({ message: "Không tìm thấy người dùng!" });
+    }
+
+    // ✅ Ghi log hành động cập nhật thông tin tài khoản
+    try {
+      await Log.create({
+        userId: req.user._id,
+        action: `✏️ Cập nhật thông tin tài khoản (${email || req.user.email})`,
+        timestamp: new Date(),
+      });
+    } catch (logErr) {
+      console.error("❌ Lỗi ghi log cập nhật thông tin:", logErr);
+    }
 
     res.json({ message: "Cập nhật thành công!", user: updatedUser });
+    
   } catch (err) {
     console.error("❌ Lỗi PUT /profile:", err);
     res.status(500).json({ message: "Lỗi server!" });
@@ -106,6 +121,16 @@ router.put("/upload-avatar", protect, upload.single("avatar"), async (req, res) 
           { avatar: avatarUrl },
           { new: true }
         ).select("-password");
+        // ✅ Ghi log sau khi cập nhật avatar thành công
+        try {
+          await Log.create({
+            userId: req.user._id,
+            action: `🖼️ Cập nhật ảnh đại diện mới (${req.user.email})`,
+            timestamp: new Date(),
+          });
+        } catch (logErr) {
+          console.error("❌ Lỗi ghi log upload avatar:", logErr);
+        }
 
         res.json({
           message: "Upload & resize avatar thành công!",

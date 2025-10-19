@@ -52,6 +52,12 @@ router.post(
       });
 
       await newUser.save();
+      await Log.create({
+        userId: newUser._id,
+        action: `🆕 Đăng ký tài khoản mới: ${email}`,
+      });
+
+
       res.status(201).json({ message: `Đăng ký thành công với vai trò: ${assignedRole.name}` });
     } catch (err) {
       console.error(err);
@@ -82,7 +88,7 @@ router.post("/login", loginRateLimiter, async (req, res) => {
     // ====== Access Token ======
     const accessToken = jwt.sign(
       { id: user._id, email: user.email, role: user.role.name },
-process.env.ACCESS_TOKEN_SECRET || "access_secret_key",
+      process.env.ACCESS_TOKEN_SECRET || "access_secret_key",
       { expiresIn: "30s" }
     );
 
@@ -202,7 +208,10 @@ const resetToken = crypto.randomBytes(32).toString("hex");
         <p>Liên kết có hiệu lực trong 10 phút.</p>
       `,
     });
-
+    await Log.create({
+      userId: user._id,
+      action: `📧 Gửi email đặt lại mật khẩu cho ${user.email}`,
+    });
     res.json({ message: "Email đặt lại mật khẩu đã được gửi!" });
   } catch (err) {
     console.error("❌ Lỗi forgot-password:", err);
@@ -234,6 +243,10 @@ router.post("/reset-password", async (req, res) => {
     user.resetPasswordExpire = undefined;
 
     await user.save();
+    await Log.create({
+      userId: user._id,
+      action: `🔐 Đặt lại mật khẩu thành công`,
+    });
 
     res.json({ message: "Mật khẩu đã được đặt lại thành công!" });
   } catch (error) {

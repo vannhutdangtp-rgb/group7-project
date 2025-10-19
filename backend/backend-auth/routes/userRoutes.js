@@ -24,17 +24,31 @@ router.delete("/:id", protect, async (req, res) => {
     const user = await User.findById(req.params.id).populate("role", "name");
     if (!user) return res.status(404).json({ message: "Không tìm thấy user" });
 
-    // ✅ vì role là object => dùng role.name
+    // ✅ Chỉ Admin hoặc chính user đó mới được xóa
     if (req.user.role?.name === "admin" || req.user._id.toString() === user._id.toString()) {
       await user.deleteOne();
+
+      // 🧠 Ghi log hành động xóa user
+      try {
+        await Log.create({
+          userId: req.user._id,
+          action: `🗑️ Xóa tài khoản: ${user.name || user.email}`,
+          timestamp: new Date(),
+        });
+      } catch (logErr) {
+        console.error("❌ Lỗi ghi log khi xóa user:", logErr);
+      }
+
       res.json({ message: "Đã xóa tài khoản!" });
     } else {
       res.status(403).json({ message: "Bạn không có quyền xóa tài khoản này!" });
     }
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: "Lỗi server" });
   }
 });
+
 // 📜 API xem log hoạt động (chỉ admin)
 router.get("/logs", protect, adminOnly, async (req, res) => {
   try {
