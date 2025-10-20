@@ -1,57 +1,57 @@
-Dự án Quản lý Người dùng – Nhóm 7
-📌 Mô tả dự án
+# 📌 Dự án Quản lý Người dùng – Nhóm 7
 
-Dự án xây dựng ứng dụng web quản lý người dùng với các chức năng cơ bản: thêm, hiển thị, sửa, xóa. Hệ thống gồm:
+## 🧾 Mô tả dự án
+Dự án xây dựng **ứng dụng web quản lý người dùng** với các tính năng nâng cao như **đăng nhập bảo mật, phân quyền, upload avatar, quên mật khẩu, ghi log hoạt động**.  
+Hệ thống gồm:
+- **Backend:** Node.js + Express  
+- **Frontend:** React + Redux  
+- **Database:** MongoDB Atlas  
+- **Triển khai & Quản lý mã nguồn:** GitHub
 
-Backend sử dụng Node.js + Express
+---
 
-Frontend phát triển bằng React
+## ⚙️ Công nghệ sử dụng
+| Thành phần | Công nghệ |
+|-------------|------------|
+| Backend | Node.js, Express, Mongoose, JWT, Multer, Cloudinary |
+| Frontend | React, Redux Toolkit, Axios, React Router DOM |
+| Database | MongoDB Atlas |
+| Công cụ | Git, GitHub, Postman, VS Code |
 
-Database sử dụng MongoDB Atlas
+---
 
-Quản lý mã nguồn bằng GitHub
-
-⚙️ Công nghệ sử dụng
-Thành phần	Công nghệ
-Backend	Node.js, Express, Mongoose
-Frontend	React, Axios
-Database	MongoDB Atlas
-Công cụ	Git, GitHub, Postman, VS Code
-🚀 Cách chạy dự án
-Backend
+## 🚀 Cách chạy dự án
+### Backend
+```bash
 cd backend
 npm install
 npm run dev
-
 Frontend
+bash
+Sao chép mã
 cd frontend
 npm install
-npm start
-
-
-
+npm run dev
 ✅ Chức năng chính
+Đăng ký, đăng nhập, xác thực JWT
 
- Thêm người dùng
+Refresh Token & quản lý session
 
- Hiển thị danh sách người dùng
+Phân quyền người dùng (User, Admin, Editor)
 
- Sửa thông tin người dùng
+Upload avatar lên Cloudinary
 
- Xóa người dùng
+Quên mật khẩu & đặt lại mật khẩu qua email thật
 
- Kết nối MongoDB Atlas
+Ghi log hoạt động người dùng, giới hạn đăng nhập sai
 
- Validation dữ liệu phía client
-
- Giao diện React thân thiện
-
- Quản lý code qua GitHub, xử lý xung đột và squash commit
+Giao diện React trực quan, dùng Redux quản lý state
 
 👥 Thành viên và đóng góp
-Đặng Văn Nhựt(Backend)	Tạo server, API GET/POST/PUT/DELETE, kết nối MongoDB
-Lê Hoàng Hảo(Frontend)	Giao diện React, kết nối API, quản lý state, validation
-Hoàng Nguyễn Hữu Lộc(Database)	Cấu hình MongoDB Atlas, tạo model, tích hợp Mongoose
+Họ và Tên	            MSSV	Vai trò	Nhiệm vụ
+Đặng Văn Nhựt	        220999	Backend	API nâng cao, JWT, logging, rate limit
+Hoàng Nguyễn Hữu Lộc	210009	Database	MongoDB, Cloudinary, Nodemailer
+Lê Hoàng Hảo	        223700	Frontend	React, Redux, Protected Routes
 
 🔗 Link GitHub Repository
-https://github.com/vannhutdangtp-rgb/group7-project
+👉 https://github.com/vannhutdangtp-rgb/group7-project
