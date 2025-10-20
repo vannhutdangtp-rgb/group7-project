@@ -1,42 +1,48 @@
 import React, { useState } from "react";
-import { login } from "../services/api";
 import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { loginThunk } from "../redux/authThunks";
 
 export default function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
-  const [message, setMessage] = useState("");
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { loading, error } = useSelector((state) => state.auth);
 
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      const res = await login(form);
-      localStorage.setItem("accessToken", res.data.accessToken);
-      localStorage.setItem("refreshToken", res.data.refreshToken);
-      localStorage.setItem("role", res.data.user.role);
+    const result = await dispatch(loginThunk(form));
 
-      setMessage("✅ Đăng nhập thành công!");
-      const role = res.data.user.role;
-
-      if (role === "admin") navigate("/admin");
-      else navigate("/profile");
-    } catch (err) {
-      setMessage(err.response?.data?.message || "❌ Sai email hoặc mật khẩu!");
+    if (result.meta.requestStatus === "fulfilled") {
+      const role = result.payload.user.role;
+      navigate(role === "admin" ? "/admin" : "/profile");
     }
   };
 
   return (
-    <div className="container" style={{ maxWidth: 400, margin: "auto" }}>
-      <h2>Đăng nhập</h2>
+    <div
+      className="container"
+      style={{
+        maxWidth: 400,
+        margin: "auto",
+        marginTop: "80px",
+        padding: "20px",
+        border: "1px solid #ccc",
+        borderRadius: "10px",
+        textAlign: "center",
+      }}
+    >
+      <h2>🔐 Đăng nhập</h2>
       <form onSubmit={handleSubmit}>
         <input
           name="email"
           placeholder="Email"
           onChange={handleChange}
           required
+          style={{ width: "100%", padding: 10, marginBottom: 10 }}
         />
         <input
           type="password"
@@ -44,8 +50,22 @@ export default function Login() {
           placeholder="Mật khẩu"
           onChange={handleChange}
           required
+          style={{ width: "100%", padding: 10, marginBottom: 10 }}
         />
-        <button type="submit">Đăng nhập</button>
+        <button
+          type="submit"
+          disabled={loading}
+          style={{
+            width: "100%",
+            padding: 10,
+            background: loading ? "#aaa" : "#007bff",
+            color: "white",
+            border: "none",
+            cursor: loading ? "not-allowed" : "pointer",
+          }}
+        >
+          {loading ? "Đang đăng nhập..." : "Đăng nhập"}
+        </button>
       </form>
 
       <p style={{ marginTop: "10px" }}>
@@ -64,7 +84,7 @@ export default function Login() {
         </button>
       </p>
 
-      {message && <p>{message}</p>}
+      {error && <p style={{ color: "red" }}>{error}</p>}
     </div>
   );
 }
