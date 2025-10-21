@@ -12,6 +12,8 @@ import { protect } from "../middleware/authMiddleware.js";
 import User from "../models/User.js";
 import sharp from "sharp";
 import streamifier from "streamifier";
+import Log from "../models/Log.js";
+
 
 const router = express.Router();
 

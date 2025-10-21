@@ -10,6 +10,8 @@ import profileRoutes from "./routes/profileRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 
 const app = express();
+app.set('trust proxy', 1);
+
 app.use(cors());
 app.use(express.json());
 
